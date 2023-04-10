@@ -88,37 +88,47 @@ BubbleSort:
 	.section	.rodata
 	.align	3
 .LC0:
-	.word	1
-	.word	2
-	.word	5
-	.word	3
-	.word	4
+	.dword	1
+	.dword	2
+	.dword	5
+	.dword	3
+	.dword	4
 	.text
 	.align	1
 	.globl	main
 	.type	main, @function
 main:
-	addi	sp,sp,-48
-	sd	ra,40(sp)
-	sd	s0,32(sp)
-	addi	s0,sp,48
+	addi	sp,sp,-64
+	sd	ra,56(sp)
+	sd	s0,48(sp)
+	addi	s0,sp,64
 	lui	a5,%hi(.LC0)
 	addi	a5,a5,%lo(.LC0)
-	ld	a4,0(a5)
-	sd	a4,-40(s0)
-	ld	a4,8(a5)
+	ld	a1,0(a5)
+	ld	a2,8(a5)
+	ld	a3,16(a5)
+	ld	a4,24(a5)
+	ld	a5,32(a5)
+	sd	a1,-56(s0)
+	sd	a2,-48(s0)
+	sd	a3,-40(s0)
 	sd	a4,-32(s0)
-	lw	a5,16(a5)
-	sw	a5,-24(s0)
-	addi	a5,s0,-40
+	sd	a5,-24(s0)
+	li	a5,88
+	sw	a5,-64(s0)
+	li	a5,100
+	sw	a5,-60(s0)
+	li	a5,99
+	sd	a5,-40(s0)
+	addi	a5,s0,-56
 	li	a1,5
 	mv	a0,a5
 	call	BubbleSort
 	li	a5,0
 	mv	a0,a5
-	ld	ra,40(sp)
-	ld	s0,32(sp)
-	addi	sp,sp,48
+	ld	ra,56(sp)
+	ld	s0,48(sp)
+	addi	sp,sp,64
 	jr	ra
 	.size	main, .-main
 	.ident	"GCC: (g5964b5cd727) 11.1.0"

@@ -15,6 +15,7 @@ main:
 	sd	s0,16(sp)
 	addi	s0,sp,32
 	sw	zero,-20(s0)
+	sw	zero,-20(s0)
 	li	a5,1
 	sw	a5,-24(s0)
 	li	a5,1

@@ -155,6 +155,7 @@ void addVarToHead(Node *var)
         HEAD->Locals=calloc(1,sizeof(Obj));
         HEAD->Locals->Name=var->Tok->Loc;
         HEAD->Locals->Ty=var->Ty;
+        HEAD->Locals->IsLocal=true;
     }
     else
     {
@@ -163,6 +164,7 @@ void addVarToHead(Node *var)
         tmp->Next=calloc(1,sizeof(Obj));
         tmp->Next->Name=var->Tok->Loc;
         tmp->Next->Ty=var->Ty;
+        tmp->Next->IsLocal=true;
     }
 
 }
@@ -451,7 +453,8 @@ static Node *exprStmt(Token **Rest, Token *Tok)
 {
     if(equal(Tok,";"))
         return NULL;
-    Node *node=expr(&Tok,Tok);
+    Node *node=newNode(ND_EXPR_STMT, Tok);
+    node->LHS = expr(&Tok, Tok);
     Tok=skip(Tok,";");
     *Rest=Tok;
     return node;
@@ -580,6 +583,7 @@ static Node *def(Token **Rest, Type *type, Token *Tok)
         {
             ret= newBinary(ND_ASSIGN,node,expr(&Tok,Tok),Tok);
         }
+        ret=newUnary(ND_EXPR_STMT,ret,Tok);
     }
     *Rest=Tok;
     return ret;
@@ -735,6 +739,7 @@ static void funDef(Token **Rest, Token *Tok)
     Obj *obj=newFun();
     Type *type=param(&Tok,Tok,0);
     obj->Name=type->Name;
+    obj->IsFunction=true;
     Tok=skip(Tok,"(");
     Type *param=funcParams(&Tok,Tok);
     Tok=skip(Tok,"{");

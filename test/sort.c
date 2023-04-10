@@ -17,6 +17,8 @@ void BubbleSort( int *data, int n )
 
 int main()
 {
-  int b[5]={1,2,5,3,4};
+  long b[5]={1,2,5,3,4};
+  int cc[2]={88,100};
+  b[2]=99;
   BubbleSort(b,5);
 }
