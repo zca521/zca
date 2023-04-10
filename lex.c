@@ -11,7 +11,7 @@ static bool equal(char *ch1,char *ch2)
 static bool isKW(char *ch)
 {
     static char *Kw[] = {"return", "if",  "else",   "for",
-                       "while",  "int", "sizeof", "char"};
+                       "while",  "int", "sizeof", "char" ,"void"};
     for(int i=0;i<sizeof(Kw) / sizeof(*Kw);i++)
     {
       if(equal(ch,Kw[i]))

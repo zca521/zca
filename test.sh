@@ -33,3 +33,4 @@ assert() {
 
 assert  0  './test/sort.c'
 assert  0  './test/jiecheng.c'
+assert  0  './test/add.c'
