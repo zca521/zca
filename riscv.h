@@ -67,7 +67,7 @@ struct Obj {
   Obj *Next;    // 指向下一对象
   char *Name;   // 变量名
   Type *Ty;     // 变量类型
-  bool IsLocal; // 是 局部或全局 变量
+  bool IsParam; // 是 局部或全局 变量
 
   // 局部变量
   int Offset; // fp的偏移量
@@ -82,6 +82,7 @@ struct Obj {
   Type *Params;   // 形参
   Node *Body;    // 函数体
   Obj *Locals;   // 本地变量
+  Node *LCN;    //.rodata
   int StackSize; // 栈大小
 };
 
@@ -135,8 +136,8 @@ struct Node {
   // 函数调用
   char *FuncName; // 函数名
   Node *Args;     // 函数参数
-
-  Obj *Var; // 存储ND_VAR种类的变量
+  Node *LCNext;
+  // Obj *Var; // 存储ND_VAR种类的变量
   int Val;  // 存储ND_NUM种类的值
   char *Str;
   void *ArrayVal;

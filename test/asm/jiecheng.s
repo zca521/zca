@@ -15,6 +15,11 @@ main:
 	sd	s0,16(sp)
 	addi	s0,sp,32
 	sw	zero,-20(s0)
+	lw	a5,-20(s0)
+	mv	a1,a5
+	lui	a5,%hi(.LC0)
+	addi	a0,a5,%lo(.LC0)
+	call	printf
 	sw	zero,-20(s0)
 	li	a5,1
 	sw	a5,-24(s0)

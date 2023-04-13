@@ -1,5 +1,6 @@
 void BubbleSort( int *data, int n )
 {
+	int c[5]={1,2,5,3,4};
 	int i, j, t;
 	for( i = 1; i <= n-1; i=i+1 )
 	{
@@ -17,8 +18,9 @@ void BubbleSort( int *data, int n )
 
 int main()
 {
-  long b[5]={1,2,5,3,4};
-  int cc[2]={88,100};
-  b[2]=99;
+  int b[5]={1,2,5,3,4};
+  int bd[5]={1,2,5,3,4};
+  int bdd[5]={1,2,3,3,4};
   BubbleSort(b,5);
+  return 0;
 }

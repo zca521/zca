@@ -206,7 +206,7 @@ Token *tokenizeFile(char *Input)
     FILE *fp=fopen(Input,"r");
     if(!fp)
     {
-        error("can't open aaafile: %s\n",Input);
+        error("can't open file: %s\n",Input);
     }
     Token *tmp=&tok; 
     while( fgets(str, N, fp) != NULL ) {

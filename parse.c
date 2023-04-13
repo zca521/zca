@@ -1,5 +1,7 @@
 #include "riscv.h"
 Obj *HEAD;
+Node *LC;
+static int num=0;
 //program -> funDef*
 //fundef -> param "(" funcParams  "{" compStmt
 //param -> decType "*"* ident
@@ -75,7 +77,9 @@ Type *PointTo(Type *ty);
 Node *newNode(NodeKind kind,Token *Tok);
 Node *newUnary(NodeKind kind,Node *LHS,Token *Tok);
 Node *newBinary(NodeKind kind,Node *LHS,Node *RHS,Token *Tok);
-void addVarToHead(Node *var);
+void addVarToHead(Node *var,bool bl);
+void addVarToLCN(Node *var);
+bool isExistStr(char *str);
 
 bool isDecl(Token *Tok)
 {
@@ -144,18 +148,18 @@ Type *PointTo(Type *ty)
 {
     Type *tmp=newType(TY_PTR);
     tmp->Base=ty;
-    tmp->Size=1;
+    tmp->Size=8;
     return tmp;
 }
 
-void addVarToHead(Node *var)
+void addVarToHead(Node *var,bool bl)
 {
     if(HEAD->Locals==NULL)
     {
         HEAD->Locals=calloc(1,sizeof(Obj));
         HEAD->Locals->Name=var->Tok->Loc;
         HEAD->Locals->Ty=var->Ty;
-        HEAD->Locals->IsLocal=true;
+        HEAD->Locals->IsParam=bl;
     }
     else
     {
@@ -164,11 +168,34 @@ void addVarToHead(Node *var)
         tmp->Next=calloc(1,sizeof(Obj));
         tmp->Next->Name=var->Tok->Loc;
         tmp->Next->Ty=var->Ty;
-        tmp->Next->IsLocal=true;
+        tmp->Next->IsParam=bl;
     }
 
 }
 
+void addVarToLCN(Node *var)
+{
+    if(LC==NULL)
+    {
+        LC=var;
+    }
+    else
+    {
+        Node *tmp=LC;
+        while(tmp->LCNext!=NULL) tmp=tmp->LCNext;
+        tmp->LCNext=var;
+    }
+}
+
+bool isExistStr(char *str)
+{
+    for(Node *nd=LC;nd;nd=nd->LCNext)
+    {
+        if(equal(nd->Tok,str))
+            return true;
+    }
+    return false;
+}
 TypeKind getArrayType(Type *type)
 {
     while(type->Base!=NULL) type=type->Base;
@@ -269,6 +296,11 @@ static Node *primary(Token **Rest, Token *Tok)
     {
         node=newNode(ND_STR,Tok);
         node->Str=Tok->Loc;
+        if(!isExistStr(Tok->Loc))
+        {
+            node->Val=num++;
+            addVarToLCN(node);
+        }
         Tok=Tok->Next;
     }
     else if(Tok->Kind==TK_NUM)
@@ -535,6 +567,8 @@ static Node *arrayVal(Token **Rest, Type *type, Token *Tok)
         //数组出界暂未警告
         ret->ArrayVal=a;
     }
+    ret->Val=num++;
+    addVarToLCN(ret);
     //字符数组暂未考虑
     *Rest=Tok->Next;
     return ret;
@@ -562,7 +596,7 @@ static Node *decArray(Token **Rest, Type *type, Token *Tok)
     ret->Ty=type;
 
     //未给ret->var赋值  不知有何用处。
-    addVarToHead(ret);
+    addVarToHead(ret,false);
     *Rest=Tok;
     return ret;
 
@@ -680,7 +714,7 @@ static Type *decType(Token **Rest, Token *Tok)
     if(equal(Tok,"int"))
     {
         ret=newType(TY_INT);
-        ret->Size=4;
+        ret->Size=8;
     }
     else if(equal(Tok,"char"))
     {
@@ -728,7 +762,7 @@ static Type *param(Token **Rest, Token *Tok,int Kind)
     {
         Node *node=newNode(ND_VAR,Tok);
         node->Ty=ret;
-        addVarToHead(node);
+        addVarToHead(node,true);
     }
     *Rest=Tok->Next;
     return ret;
@@ -737,6 +771,7 @@ static Type *param(Token **Rest, Token *Tok,int Kind)
 static void funDef(Token **Rest, Token *Tok)
 {
     Obj *obj=newFun();
+    LC=NULL;
     Type *type=param(&Tok,Tok,0);
     obj->Name=type->Name;
     obj->IsFunction=true;
@@ -747,7 +782,7 @@ static void funDef(Token **Rest, Token *Tok)
     obj->Ty=type;//return type
     obj->Body=body;
     obj->Params=param;
-    
+    obj->LCN=LC;
     *Rest=Tok;
 }
 
