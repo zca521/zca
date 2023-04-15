@@ -1,26 +1,28 @@
-void BubbleSort( int *data, int n )
-{
-	int c[5]={1,2,5,3,4};
-	int i, j, t;
-	for( i = 1; i <= n-1; i=i+1 )
-	{
-		for( j = 1; j <= n-i; j=j+1 )
-		{
-			if( data[j+1] < data[j] )
-			{
-				t = data[j+1];
-				data[j+1] = data[j];
-				data[j]   = t;
-			}
-		}
-	}
-}
-
 int main()
 {
-  int b[5]={1,2,5,3,4};
-  int bd[5]={1,2,5,3,4};
-  int bdd[5]={1,2,3,3,4};
-  BubbleSort(b,5);
-  return 0;
+  	int a[10]={99,2,34,88,100,20,1,5,3,4};
+	int i, j, t;
+	int len=10;
+    printf("原数组为：");
+    for (i=0; i<len; i=i+1) {
+        printf("%d  ",a[i]);
+    }
+    printf("\n");
+    for (i=0; i<len-1; i=i+1) {	
+        for (j=0; j<len-1-i; j=j+1) 
+		{
+            if (a[j]>a[j+1]) 
+			{
+                t = a[j];
+                a[j] = a[j+1];
+                a[j+1] = t;
+            }
+        }
+    }
+    printf("排序后为：");
+    for (i=0; i<len; i=i+1) {
+        printf("%d  ",a[i]);
+    }
+    printf("\n");
+    return 0;
 }

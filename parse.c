@@ -79,7 +79,7 @@ Node *newUnary(NodeKind kind,Node *LHS,Token *Tok);
 Node *newBinary(NodeKind kind,Node *LHS,Node *RHS,Token *Tok);
 void addVarToHead(Node *var,bool bl);
 void addVarToLCN(Node *var);
-bool isExistStr(char *str);
+bool isExistStr(Node *ND);
 
 bool isDecl(Token *Tok)
 {
@@ -187,12 +187,15 @@ void addVarToLCN(Node *var)
     }
 }
 
-bool isExistStr(char *str)
+bool isExistStr(Node *ND)
 {
     for(Node *nd=LC;nd;nd=nd->LCNext)
     {
-        if(equal(nd->Tok,str))
+        if(equal(nd->Tok,ND->Str))
+        {
+            ND->Val=nd->Val;
             return true;
+        }
     }
     return false;
 }
@@ -296,7 +299,7 @@ static Node *primary(Token **Rest, Token *Tok)
     {
         node=newNode(ND_STR,Tok);
         node->Str=Tok->Loc;
-        if(!isExistStr(Tok->Loc))
+        if(!isExistStr(node))
         {
             node->Val=num++;
             addVarToLCN(node);
@@ -567,6 +570,7 @@ static Node *arrayVal(Token **Rest, Type *type, Token *Tok)
         //数组出界暂未警告
         ret->ArrayVal=a;
     }
+    ret->Ty=type;
     ret->Val=num++;
     addVarToLCN(ret);
     //字符数组暂未考虑

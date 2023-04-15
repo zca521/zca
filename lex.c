@@ -1,8 +1,6 @@
 #include "riscv.h"
 
 #define N 255  //文件每行字符最大值
-// 输入的字符串
-static char *CurrentInput;
 
 static bool equal(char *ch1,char *ch2)
 {
@@ -50,14 +48,11 @@ void error(char *Fmt, ...) {
 // 输出错误出现的位置，并退出
 static void verrorAt(char *Loc, char *Fmt, va_list VA) {
   // 先输出源信息
-  fprintf(stderr, "%s\n", CurrentInput);
+  fprintf(stderr, "error:%s  ,", Loc);
 
   // 输出出错信息
   // 计算出错的位置，Loc是出错位置的指针，CurrentInput是当前输入的首地址
-  int Pos = Loc - CurrentInput;
   // 将字符串补齐为Pos位，因为是空字符串，所以填充Pos个空格。
-  fprintf(stderr, "%*s", Pos, "");
-  fprintf(stderr, "^ ");
   vfprintf(stderr, Fmt, VA);
   fprintf(stderr, "\n");
   va_end(VA);

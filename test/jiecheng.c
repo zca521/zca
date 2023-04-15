@@ -1,12 +1,12 @@
 int main()
 {
-	int i = 0+0;
-	printf("%d", i);
-	i=0+1-1;
+	int i =1;
 	int sum = 1;
-	for (i = 1; i <= 5; i++)
+	int n=5;
+	for (i = 1; i <= n; i=i+1)
 	{
 		sum = sum * i;
 	}
-	printf("%d", sum);
+	printf("%d的阶乘是%d\n",n, sum);
+	return 0;
 }
