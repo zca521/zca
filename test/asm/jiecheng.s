@@ -4,7 +4,7 @@
 	.section	.rodata
 	.align	3
 .LC0:
-	.string	"%d\n"
+	.string	"%d\347\232\204\351\230\266\344\271\230\346\230\257%d\n"
 	.text
 	.align	1
 	.globl	main
@@ -18,6 +18,8 @@ main:
 	sw	a5,-20(s0)
 	li	a5,1
 	sw	a5,-24(s0)
+	li	a5,5
+	sw	a5,-28(s0)
 	li	a5,1
 	sw	a5,-20(s0)
 	j	.L2
@@ -32,10 +34,14 @@ main:
 	sw	a5,-20(s0)
 .L2:
 	lw	a5,-20(s0)
-	sext.w	a4,a5
-	li	a5,5
+	mv	a4,a5
+	lw	a5,-28(s0)
+	sext.w	a4,a4
+	sext.w	a5,a5
 	ble	a4,a5,.L3
-	lw	a5,-24(s0)
+	lw	a4,-24(s0)
+	lw	a5,-28(s0)
+	mv	a2,a4
 	mv	a1,a5
 	lui	a5,%hi(.LC0)
 	addi	a0,a5,%lo(.LC0)

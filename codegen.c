@@ -41,6 +41,18 @@ static int alignTo(int N, int Align) {
   return (N + Align - 1) / Align * Align;
 }
 
+int getArrayLen(Type *ty)
+{
+  int len=1;
+  Type *t=ty;
+  while(t->Kind==TY_ARRAY)
+  {
+      len=len*t->ArrayLen;
+      t=t->Base;
+  }
+  return len;
+}
+
 static int getTySize(Type *ty)
 {
   if(ty->Kind==TY_INT||ty->Kind==TY_CHAR||ty->Kind==TY_PTR)
@@ -53,9 +65,6 @@ static int getTySize(Type *ty)
 static void assignLVarOffsets(Obj *Prog) {
   // 为每个函数计算其变量所用的栈空间
   for (Obj *Fn = Prog; Fn; Fn = Fn->Next) {
-    // 如果不是函数,则终止
-    if (!Fn->IsFunction)
-      continue;
 
     int Offset = 0;
     // 读取所有变量
@@ -178,7 +187,8 @@ static void genExpr(Node *Nd)
         // printf("  addi  a5,a5,%%lo(.LC%d)\n",Nd->RHS->Val);
         addr=getOffset(Nd->LHS);
         printf("  la  a5,.LC%d\n",Nd->RHS->Val);
-        for(int i=0;i<Nd->LHS->Ty->ArrayLen;i++)
+        int len=getArrayLen(Nd->LHS->Ty);
+        for(int i=0;i<len;i++)
         {
           printf("  ld  a0,%d(a5)\n",i*8);
           printf("  sd  a0,%d(fp)\n",addr+i*8);
@@ -197,6 +207,18 @@ static void genExpr(Node *Nd)
       printf("  addi  a0,a0,%d\n",addr);
       printf("  add a0,a0,fp\n");
       printf("  ld  a0,0(a0)\n");
+      break;
+    }
+    case ND_MUL_ARRAY:
+    {
+      genExpr(Nd->LHS);
+      push();
+      // printf("  mv  t1,a0\n");
+      genExpr(Nd->RHS);
+      pop("t0");
+      printf("  li  t1,%d\n",Nd->Val);
+      printf("  mul t0,t0,t1\n");
+      printf("  add a0,a0,t0\n");
       break;
     }
     case ND_ASSIGN_ARRAY:{
@@ -304,7 +326,8 @@ void emitData(Node *nd)
     else if(nd->Kind==ND_ASSIGN_ARRAY)
     {
       int *a=(int *)nd->ArrayVal;
-      for(int i=0;i<nd->Ty->ArrayLen;i++)
+      int len=getArrayLen(nd->Ty);
+      for(int i=0;i<len;i++)
       {
         printf("  .dword  %d\n",a[i]);
       }
@@ -316,8 +339,6 @@ void emitText(Obj *Prog)
   for (Obj *Fn = Prog; Fn; Fn = Fn->Next) {
     emitData(Fn->LCN);
 
-    if (!Fn->IsFunction)
-      continue;
     printf("  .globl %s\n", Fn->Name);
     printf("  .text\n");
     printf("%s:\n", Fn->Name);

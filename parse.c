@@ -319,12 +319,39 @@ static Node *primary(Token **Rest, Token *Tok)
 static Node *postfix(Token **Rest, Token *Tok)
 {
     Node *node =primary(&Tok,Tok);
+    Node *right;
+    bool i=true;
+    int j=0;
+    int *array=NULL;
     while(equal(Tok,"["))
     {
         Tok=Tok->Next;
-        node=newBinary(ND_ARRAY_VALUE,node,expr(&Tok,Tok),Tok);
+        if(i)
+        {
+            int mul=getArrayLen(node->Ty);
+            array=calloc(mul,sizeof(int));
+            Type *t=node->Ty;
+            j=mul-1;
+            while(t->Kind==TY_ARRAY)
+            {
+                array[j]=t->ArrayLen;
+                j--;
+                t=t->Base;
+            }
+
+            right=expr(&Tok,Tok);
+            i=false;
+        }
+        else
+        {
+            right=newBinary(ND_MUL_ARRAY,right,expr(&Tok,Tok),Tok);
+            right->Val=array[j+2];
+            j++;
+        }
         Tok=skip(Tok,"]");
     }
+    if(!i)
+        node=newBinary(ND_ARRAY_VALUE,node,right,Tok);
     *Rest=Tok;
     return node;
 }
@@ -556,11 +583,18 @@ static Node *arrayVal(Token **Rest, Type *type, Token *Tok)
     Tok=skip(Tok,"{");
     if(getArrayType(type)==TY_INT)
     {
-        int *a=calloc(type->ArrayLen,sizeof(int));
+        int *a=calloc(getArrayLen(type),sizeof(int));
         a[0]=Tok->Val;
         Tok=Tok->Next;
         int i=1;
-        while(!equal(Tok,"}")&&(i<type->ArrayLen))
+        int len=1;
+        Type *t=type;
+        while(t->Kind==TY_ARRAY)
+        {
+            len=len*t->ArrayLen;
+            t=t->Base;
+        }
+        while(!equal(Tok,"}")&&(i<len))
         {
             Tok=skip(Tok,",");
             a[i]=Tok->Val;
@@ -599,7 +633,7 @@ static Node *decArray(Token **Rest, Type *type, Token *Tok)
     }
     ret->Ty=type;
 
-    //未给ret->var赋值  不知有何用处。
+    //未给ret->var赋值 
     addVarToHead(ret,false);
     *Rest=Tok;
     return ret;
@@ -778,7 +812,6 @@ static void funDef(Token **Rest, Token *Tok)
     LC=NULL;
     Type *type=param(&Tok,Tok,0);
     obj->Name=type->Name;
-    obj->IsFunction=true;
     Tok=skip(Tok,"(");
     Type *param=funcParams(&Tok,Tok);
     Tok=skip(Tok,"{");

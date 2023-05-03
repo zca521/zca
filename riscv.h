@@ -58,8 +58,6 @@ typedef struct Token {
   int Val;        // 值
   char *Loc;      // 在解析的字符串内的位置
   int Len;        // 长度
-  Type *Ty;       // TK_STR使用
-//   char *Str;      // 字符串字面量，包括'\0'
 }Token;
 
 
@@ -67,16 +65,10 @@ struct Obj {
   Obj *Next;    // 指向下一对象
   char *Name;   // 变量名
   Type *Ty;     // 变量类型
-  bool IsParam; // 是 局部或全局 变量
+  bool IsParam; // 是否是函数形参
 
   // 局部变量
   int Offset; // fp的偏移量
-
-  // 函数 或 全局变量
-  bool IsFunction;
-
-  // 全局变量
-  // char *InitData;
 
   // 函数
   Type *Params;   // 形参
@@ -108,6 +100,7 @@ typedef enum {
   ND_FUNCALL,   // 函数调用
   ND_EXPR_STMT, // 表达式语句
   ND_ASSIGN_ARRAY, // 数组赋值
+  ND_MUL_ARRAY,//多维数组
   ND_VAR,       // 变量
   ND_NUM,       // 数字
   ND_STR,       //字符常量
@@ -146,7 +139,7 @@ struct Node {
 void error(char *Fmt, ...);
 void errorAt(char *Loc, char *Fmt, ...);
 void errorTok(Token *Tok, char *Fmt, ...);
-
+int getArrayLen(Type *ty);
 //词法分析入口函数
 Token *tokenizeFile(char *Input);
 // 语法解析入口函数

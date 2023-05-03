@@ -1,10 +1,10 @@
-	.file	"add.c"
+	.file	"expr.c"
 	.option nopic
 	.text
 	.section	.rodata
 	.align	3
 .LC0:
-	.string	"\347\273\223\346\236\234\346\230\257%d\n"
+	.string	"%d\n"
 	.text
 	.align	1
 	.globl	main
@@ -14,15 +14,20 @@ main:
 	sd	ra,24(sp)
 	sd	s0,16(sp)
 	addi	s0,sp,32
-	sw	zero,-20(s0)
-	li	a5,1
-	sw	a5,-24(s0)
-	lw	a5,-20(s0)
-	mv	a4,a5
-	lw	a5,-24(s0)
-	addw	a5,a4,a5
+	li	a5,8
 	sw	a5,-20(s0)
-	lw	a5,-20(s0)
+	li	a5,2
+	sw	a5,-24(s0)
+	lw	a5,-24(s0)
+	mulw	a5,a5,a5
+	sext.w	a5,a5
+	lw	a4,-20(s0)
+	addw	a5,a4,a5
+	sext.w	a5,a5
+	lw	a4,-24(s0)
+	divw	a5,a5,a4
+	sw	a5,-28(s0)
+	lw	a5,-28(s0)
 	mv	a1,a5
 	lui	a5,%hi(.LC0)
 	addi	a0,a5,%lo(.LC0)

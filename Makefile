@@ -4,11 +4,11 @@ CFLAGS=-std=c11 -g -fno-common
 CC=gcc
 
 all:main.c lex.c parse.c codegen.c riscv.h
-	$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^
 	
 test:all
 	./test.sh
 
 .PHONY:clean
 clean:
-	-rm -rf *.s all
+	@-rm -rf *.s all
