@@ -16,5 +16,5 @@ test() {
 test  './test/expr.c'
 test  './test/jiecheng.c'
 test  './test/funcall.c'
-# test  './test/sort.c'
+test  './test/sort.c'
 test  './test/array.c'
